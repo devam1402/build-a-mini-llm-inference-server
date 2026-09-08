@@ -40,8 +40,38 @@ def top_k_filter(logits, k):
 
     return result
 
-# Step 4 - top_p_filter (not yet solved)
-# TODO: implement
+# Step 4 - top_p_filter
+def top_p_filter(logits, p):
+    # Convert logits to probabilities
+    probs = stable_softmax(logits)
+
+    # Sort probabilities from largest to smallest
+    sorted_indices = np.argsort(-probs, axis=-1)
+    sorted_probs = np.take_along_axis(
+        probs, sorted_indices, axis=-1
+    )
+
+    # Cumulative probability
+    cumulative_probs = np.cumsum(sorted_probs, axis=-1)
+
+    # Probability mass BEFORE the current token
+    cumulative_before = cumulative_probs - sorted_probs
+
+    # Keep the token if the mass before it is still below p
+    keep_sorted = cumulative_before < p
+
+    # Convert sorted mask back to original token order
+    keep_mask = np.zeros_like(keep_sorted, dtype=bool)
+
+    np.put_along_axis(
+        keep_mask,
+        sorted_indices,
+        keep_sorted,
+        axis=-1,
+    )
+
+    # Mask rejected logits
+    return np.where(keep_mask, logits, -np.inf)
 
 # Step 5 - sample_from_probs (not yet solved)
 # TODO: implement
