@@ -73,8 +73,11 @@ def top_p_filter(logits, p):
     # Mask rejected logits
     return np.where(keep_mask, logits, -np.inf)
 
-# Step 5 - sample_from_probs (not yet solved)
-# TODO: implement
+# Step 5 - sample_from_probs
+import numpy as np
+
+def sample_from_probs(probs, rng):
+    return int(rng.choice(len(probs), p=probs))
 
 # Step 6 - greedy_select (not yet solved)
 # TODO: implement
