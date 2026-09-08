@@ -79,8 +79,9 @@ import numpy as np
 def sample_from_probs(probs, rng):
     return int(rng.choice(len(probs), p=probs))
 
-# Step 6 - greedy_select (not yet solved)
-# TODO: implement
+# Step 6 - greedy_select
+def greedy_select(logits):
+    return int(np.argmax(logits))
 
 # Step 7 - build_vocab (not yet solved)
 # TODO: implement
