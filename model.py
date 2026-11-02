@@ -394,3 +394,54 @@ def model_prefill(token_ids, params):
 
     return logits, cache
 
+# Step 16 - model_decode_step
+import numpy as np
+
+def model_decode_step(token_id, cache, params):
+    """
+    Advance autoregressive generation by one token using an existing KV cache.
+
+    Args:
+        token_id: One incoming token ID (scalar).
+        cache: Existing KV cache with K, V and length.
+        params: Model weights.
+
+    Returns:
+        logits: Next-token logits, shape (V,).
+        cache: Updated KV cache.
+    """
+
+    # 1. Wrap the scalar token ID in a length-1 sequence.
+    token_ids = np.asarray([token_id], dtype=np.int64)
+
+    # 2. Embed the new token.
+    # Support both names: 'embedding' (used by the supplied tests)
+    # and 'E' (the alternative name in the task description).
+    embedding_matrix = params["embedding"] if "embedding" in params else params["E"]
+    x = embed_tokens(token_ids, embedding_matrix)
+
+    # 3. Compute Q, K and V for this token only.
+    q = linear_projection(x, params["Wq"])
+    k_new = linear_projection(x, params["Wk"])
+    v_new = linear_projection(x, params["Wv"])
+
+    # 4. Append the new Key and Value to the existing cache.
+    # append_kv mutates the cache and increments cache["length"].
+    append_kv(cache, k_new, v_new)
+
+    # 5. Read only valid cache entries, not the unused allocated rows.
+    length = cache["length"]
+    K = cache["K"][:length]
+    V = cache["V"][:length]
+
+    # 6. The new query can attend to every cached entry.
+    attn_out = causal_attention(q, K, V, is_causal=False)
+
+    # 7. Project the attention result.
+    h = linear_projection(attn_out, params["Wo"])
+
+    # 8. Project into vocabulary logits and remove the one-token axis.
+    logits = linear_projection(h, params["W_out"])[0]
+
+    return logits, cache
+
