@@ -336,3 +336,61 @@ def causal_attention(q, k, v, is_causal=True):
 
     return output
 
+# Step 15 - model_prefill
+import numpy as np
+
+
+def model_prefill(token_ids, params):
+    """
+    Run the prefill pass of a tiny single-layer Transformer.
+
+    Args:
+        token_ids: Input token IDs, shape (T,)
+        params: Dictionary containing model weights and configuration.
+
+    Returns:
+        logits: Next-token logits, shape (V,)
+        cache: Populated KV cache dictionary.
+    """
+
+    # 1. Convert token IDs into embeddings.
+    x = embed_tokens(token_ids, params["embedding"])
+
+    # 2. Project embeddings into Query, Key and Value.
+    q = linear_projection(x, params["Wq"])
+    k = linear_projection(x, params["Wk"])
+    v = linear_projection(x, params["Wv"])
+
+    # 3. Initialize an empty KV cache.
+    d_model = params["embedding"].shape[1]
+
+    cache = init_kv_cache(
+        params["max_seq_len"],
+        d_model
+    )
+
+    # 4. Store all prompt Keys and Values in the cache.
+    append_kv(cache, k, v)
+
+    # 5. Run causal self-attention using valid cached positions.
+    attn_out = causal_attention(
+        q,
+        cache["K"][:cache["length"]],
+        cache["V"][:cache["length"]],
+        is_causal=True
+    )
+
+    # 6. Apply attention output projection.
+    h = linear_projection(attn_out, params["Wo"])
+
+    # 7. Select the last token's hidden state.
+    last_hidden = h[-1]
+
+    # 8. Project into vocabulary logits.
+    logits = linear_projection(
+        last_hidden,
+        params["W_out"]
+    )
+
+    return logits, cache
+

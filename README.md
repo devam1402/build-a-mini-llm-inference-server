@@ -24,6 +24,7 @@ python scaffold.py
 - [x] **12.** init_kv_cache
 - [x] **13.** append_kv
 - [x] **14.** causal_attention
+- [x] **15.** model_prefill
 
 ---
 
