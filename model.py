@@ -179,6 +179,16 @@ def decode_tokens(token_ids, vocab, skip_special=True):
     # Step 8: Combine tokens into one string
     return "".join(pieces)
 
+# Step 10 - embed_tokens
+import numpy as np
+
+def embed_tokens(token_ids, embedding_matrix):
+    # Convert token IDs into a NumPy array
+    token_ids = np.asarray(token_ids, dtype=np.int64)
+
+    # Look up the embedding row for each token ID
+    return embedding_matrix[token_ids]
+
 # Step 14 - causal_attention
 import numpy as np
 
