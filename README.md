@@ -18,6 +18,7 @@ python scaffold.py
 - [x] **6.** greedy_select
 - [x] **7.** build_vocab
 - [x] **8.** encode_prompt
+- [x] **9.** decode_tokens
 
 ---
 

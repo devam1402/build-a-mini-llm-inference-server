@@ -145,3 +145,37 @@ def encode_prompt(text, vocab, add_bos=True):
     # Step 5: Return the flat list of token IDs
     return ids
 
+# Step 9 - decode_tokens
+def decode_tokens(token_ids, vocab, skip_special=True):
+
+    # Step 1: Get the ID-to-token mapping
+    id_to_token = vocab["id_to_token"]
+
+    # Step 2: Store decoded token strings
+    pieces = []
+
+    # Step 3: Process each token ID
+    for tid in token_ids:
+
+        # Step 4: Convert NumPy integer to Python integer
+        tid = int(tid)
+
+        # Step 5: Look up the corresponding token
+        token = id_to_token[tid]
+
+        # Step 6: Identify and skip special tokens
+        is_special = (
+            len(token) >= 2
+            and token.startswith("<")
+            and token.endswith(">")
+        )
+
+        if skip_special and is_special:
+            continue
+
+        # Step 7: Keep ordinary tokens
+        pieces.append(token)
+
+    # Step 8: Combine tokens into one string
+    return "".join(pieces)
+
