@@ -179,3 +179,55 @@ def decode_tokens(token_ids, vocab, skip_special=True):
     # Step 8: Combine tokens into one string
     return "".join(pieces)
 
+# Step 14 - causal_attention
+import numpy as np
+
+
+def causal_attention(q, k, v, is_causal=True):
+    """
+    Compute scaled dot-product attention.
+
+    Args:
+        q: Query matrix, shape (Tq, D)
+        k: Key matrix, shape (Tk, D)
+        v: Value matrix, shape (Tk, Dv)
+        is_causal: Whether to apply a causal attention mask.
+
+    Returns:
+        Output matrix, shape (Tq, Dv)
+    """
+
+    # 1. Calculate the query-key similarity scores.
+    scores = q @ k.T
+
+    # 2. Scale scores by the square root of the head dimension.
+    d = q.shape[-1]
+    scores = scores / np.sqrt(d)
+
+    # 3. Apply the causal mask when requested.
+    if is_causal:
+        tq = q.shape[0]
+        tk = k.shape[0]
+
+        # For cached decoding, query positions correspond
+        # to the final Tq positions in the key sequence.
+        query_positions = np.arange(tq) + (tk - tq)
+        key_positions = np.arange(tk)
+
+        # A query cannot attend to keys from future positions.
+        mask = key_positions[None, :] > query_positions[:, None]
+
+        scores = np.where(mask, -np.inf, scores)
+
+    # 4. Numerically stable softmax.
+    scores_max = np.max(scores, axis=-1, keepdims=True)
+    exp_scores = np.exp(scores - scores_max)
+    attention_weights = exp_scores / np.sum(
+        exp_scores, axis=-1, keepdims=True
+    )
+
+    # 5. Weighted sum of the value vectors.
+    output = attention_weights @ v
+
+    return output
+

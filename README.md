@@ -19,6 +19,7 @@ python scaffold.py
 - [x] **7.** build_vocab
 - [x] **8.** encode_prompt
 - [x] **9.** decode_tokens
+- [x] **14.** causal_attention
 
 ---
 
