@@ -215,6 +215,40 @@ def linear_projection(x, weight, bias=None):
 
     return output
 
+# Step 12 - init_kv_cache
+import numpy as np
+
+
+def init_kv_cache(max_seq_len, d_model):
+    """
+    Initialize an empty KV cache for one sequence.
+
+    Args:
+        max_seq_len: Maximum number of token positions.
+        d_model: Dimension of each key/value vector.
+
+    Returns:
+        Dictionary containing K, V and length.
+    """
+
+    K = np.zeros(
+        (max_seq_len, d_model),
+        dtype=np.float32
+    )
+
+    V = np.zeros(
+        (max_seq_len, d_model),
+        dtype=np.float32
+    )
+
+    cache = {
+        "K": K,
+        "V": V,
+        "length": 0
+    }
+
+    return cache
+
 # Step 14 - causal_attention
 import numpy as np
 
