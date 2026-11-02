@@ -189,6 +189,32 @@ def embed_tokens(token_ids, embedding_matrix):
     # Look up the embedding row for each token ID
     return embedding_matrix[token_ids]
 
+# Step 11 - linear_projection
+import numpy as np
+
+
+def linear_projection(x, weight, bias=None):
+    """
+    Apply a linear projection.
+
+    Args:
+        x: Input tensor (..., D_in)
+        weight: Weight matrix (D_in, D_out)
+        bias: Optional bias vector (D_out,)
+
+    Returns:
+        Output tensor (..., D_out)
+    """
+
+    # Matrix multiplication.
+    output = x @ weight
+
+    # Add bias if provided.
+    if bias is not None:
+        output = output + bias
+
+    return output
+
 # Step 14 - causal_attention
 import numpy as np
 

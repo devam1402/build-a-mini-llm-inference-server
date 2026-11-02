@@ -20,6 +20,7 @@ python scaffold.py
 - [x] **8.** encode_prompt
 - [x] **9.** decode_tokens
 - [x] **10.** embed_tokens
+- [x] **11.** linear_projection
 - [x] **14.** causal_attention
 
 ---
