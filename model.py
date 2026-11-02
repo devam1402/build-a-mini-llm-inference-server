@@ -249,6 +249,41 @@ def init_kv_cache(max_seq_len, d_model):
 
     return cache
 
+# Step 13 - append_kv
+def append_kv(cache, k_new, v_new):
+    """
+    Append new Key and Value rows to a contiguous KV cache.
+
+    Args:
+        cache: KV cache dictionary containing K, V and length.
+        k_new: New key vectors, shape (t, d_model).
+        v_new: New value vectors, shape (t, d_model).
+
+    Returns:
+        The same cache dictionary, mutated in place.
+    """
+
+    # 1. Read the current valid cache length.
+    L = cache["length"]
+
+    # 2. Find how many new rows we need to append.
+    t = k_new.shape[0]
+
+    # 3. Calculate the destination range.
+    end = L + t
+
+    # 4. Write new keys into the cache.
+    cache["K"][L:end] = k_new
+
+    # 5. Write new values into the cache.
+    cache["V"][L:end] = v_new
+
+    # 6. Update the valid cache length.
+    cache["length"] = end
+
+    # 7. Return the same cache object.
+    return cache
+
 # Step 14 - causal_attention
 import numpy as np
 
