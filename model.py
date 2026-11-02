@@ -115,3 +115,33 @@ def build_vocab(corpus, special_tokens):
         "id_to_token": id_to_token
     }
 
+# Step 8 - encode_prompt
+def encode_prompt(text, vocab, add_bos=True):
+    # Step 1: Get the token-to-ID dictionary
+    token_to_id = vocab["token_to_id"]
+
+    # Step 2: Start with an empty list
+    ids = []
+
+    # Step 3: Add BOS if requested and available
+    if add_bos and "<bos>" in token_to_id:
+        ids.append(token_to_id["<bos>"])
+
+    # Step 4: Encode every character
+    for c in text:
+
+        # Case A: Character exists in vocabulary
+        if c in token_to_id:
+            ids.append(token_to_id[c])
+
+        # Case B: Character is unknown, use UNK if available
+        elif "<unk>" in token_to_id:
+            ids.append(token_to_id["<unk>"])
+
+        # Case C: No UNK token, skip character
+        else:
+            continue
+
+    # Step 5: Return the flat list of token IDs
+    return ids
+
