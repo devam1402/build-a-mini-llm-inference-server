@@ -459,3 +459,30 @@ def make_request(
         "sampling_params": sampling_params
     }
 
+# Step 27 - init_sequence_state
+def init_sequence_state(request, params):
+    # 1. Get the original prompt tokens.
+    prompt_token_ids = list(request["prompt_token_ids"])
+
+    # 2. Run prefill on the complete prompt.
+    last_logits, cache = model_prefill(
+        prompt_token_ids,
+        params
+    )
+
+    # 3. Create and return the initial sequence state.
+    state = {
+        "request_id": request["request_id"],
+        "prompt_token_ids": prompt_token_ids,
+        "generated": [],
+        "cache": cache,
+        "last_logits": last_logits,
+        "done": False,
+        "sampling_params": request["sampling_params"],
+        "max_new_tokens": request["max_new_tokens"]
+    }
+
+    return state
+    # TODO: Initialize per-sequence state by running prefill and storing cache/logits.
+    pass
+

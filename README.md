@@ -27,6 +27,7 @@ python scaffold.py
 - [x] **15.** model_prefill
 - [x] **16.** model_decode_step
 - [x] **26.** make_request
+- [x] **27.** init_sequence_state
 
 ---
 
