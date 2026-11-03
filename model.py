@@ -445,3 +445,17 @@ def model_decode_step(token_id, cache, params):
 
     return logits, cache
 
+# Step 26 - make_request
+def make_request(
+    request_id,
+    prompt_token_ids,
+    max_new_tokens,
+    sampling_params
+):
+    return {
+        "request_id": request_id,
+        "prompt_token_ids": list(prompt_token_ids),
+        "max_new_tokens": max_new_tokens,
+        "sampling_params": sampling_params
+    }
+
