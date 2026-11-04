@@ -28,6 +28,7 @@ python scaffold.py
 - [x] **16.** model_decode_step
 - [x] **26.** make_request
 - [x] **27.** init_sequence_state
+- [x] **28.** sequence_decode_step
 
 ---
 

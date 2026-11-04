@@ -486,3 +486,50 @@ def init_sequence_state(request, params):
     # TODO: Initialize per-sequence state by running prefill and storing cache/logits.
     pass
 
+# Step 28 - sequence_decode_step
+def sequence_decode_step(state, params, rng):
+
+    # 1. Read sampling parameters.
+    if "request" in state:
+        sp = state["request"]["sampling_params"]
+    else:
+        sp = state["sampling_params"]
+
+    greedy = sp.get("greedy", False)
+    temperature = sp.get("temperature", 1.0)
+    top_k = sp.get("top_k", 0)
+    top_p = sp.get("top_p", 1.0)
+
+    # 2. Select the next token.
+    if greedy or temperature <= 0:
+        next_token_id = greedy_select(state["last_logits"])
+
+    else:
+        logits = apply_temperature(
+            state["last_logits"],
+            temperature
+        )
+
+        if top_k is not None and top_k > 0:
+            logits = top_k_filter(logits, top_k)
+
+        if top_p is not None and top_p < 1.0:
+            logits = top_p_filter(logits, top_p)
+
+        probs = stable_softmax(logits)
+        next_token_id = sample_from_probs(probs, rng)
+
+    # 3. Advance the model.
+    new_logits, cache = model_decode_step(
+        next_token_id,
+        state["cache"],
+        params
+    )
+
+    # 4. Update state in place.
+    state["cache"] = cache
+    state["last_logits"] = new_logits
+    state["generated"].append(next_token_id)
+
+    return next_token_id, state
+
